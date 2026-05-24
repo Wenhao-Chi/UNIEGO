@@ -1,0 +1,9 @@
+# Run gen1 proxy inference for teacher delta: ego_siglip.
+_BASE_: base_infer_gen1.yaml
+
+DATA:
+  TEST_SPLIT: 'train'
+TEST:
+  CHECKPOINT_FILE_PATH: './models/Assembly101_pi_ego/stage1/ego_siglip/checkpoints/checkpoint_epoch_{SOLVER.MAX_EPOCH:05d}.pyth'
+OUTPUT_DIR: './models/Assembly101_pi_ego/stage1/ego_siglip'
+EXO_MODALITY: ['ego_siglip']

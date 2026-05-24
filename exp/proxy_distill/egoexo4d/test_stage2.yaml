@@ -1,0 +1,10 @@
+# Test the final proxy-gen2 checkpoint.
+_BASE_: base_stage2.yaml
+
+TRAIN:
+  ENABLE: False
+  AUTO_RESUME: False
+TEST:
+  ENABLE: True
+  CHECKPOINT_FILE_PATH: './models/EgoExo_4D_pi_ego_gen2/dist_top1_from_merged/checkpoints/checkpoint_epoch_{SOLVER.MAX_EPOCH:05d}.pyth'
+TRAINING_MODE: 'basic'

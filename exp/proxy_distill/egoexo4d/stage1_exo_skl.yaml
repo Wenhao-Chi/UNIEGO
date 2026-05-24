@@ -1,0 +1,5 @@
+# Stage 1 teacher delta: exo_skl.
+_BASE_: base_stage1.yaml
+
+OUTPUT_DIR: './models/EgoExo_4D_pi_ego/stage1/exo_skl'
+EXO_MODALITY: ['exo_skl']

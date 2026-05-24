@@ -1,0 +1,155 @@
+TRAIN:
+  ENABLE: True
+#  DATASET: EgoExo_Fitness
+  DATASET: EgoExo_Fitness_gen2
+  BATCH_SIZE: 8
+  EVAL_PERIOD: 5
+  CHECKPOINT_PERIOD: 5
+  AUTO_RESUME: True
+DATA:
+  PATH_TO_DATA_DIR: '/home/wchi/Datasets/EgoExo-Fitness/vclip/'
+#  PATH_TO_DATA_DIR: '/home/wchi/Datasets/EgoExo-Fitness/vclip_swap_train_test'
+#  PATH_TO_DATA_DIR_EGO: '/home/wchi/Datasets/EgoExo-Fitness/Ego_matched/'
+#  PATH_TO_DATA_DIR_EXO: '/home/wchi/Datasets/EgoExo-Fitness/Exo_matched/'
+
+#  PATH_TO_DATA_DIR: '/home/wchi/Datasets/EgoExo-Fitness/Exo/'
+#  PATH_TO_DATA_DIR: '/home/wchi/Datasets/EgoExo-Fitness/Exo_swap_train_test/'
+  PATH_PREFIX: '/home/wchi/Datasets/EgoExo-Fitness/videos_subaction'
+  EXO_FEAT_DIR: '/home/wchi/Projects/TimeSformer/image_tokens/egoexo_fitness_tokens_exo'
+  EXO_FEAT_DIR_SKL: '/home/wchi/Projects/pyskl/gcn_tokens'
+#  EXO_FEAT_DIR_SKL: '/home/wchi/Projects/pyskl/gcn_tokens_Fitness/NVC'
+  EXO_LOGITS_DIR: '/home/wchi/Projects/TimeSformer/models/egoexo_fitness/exo_pretrained/scores_pred_exo_logits'
+  EXO_LOGITS_DIR_SKL: '/home/wchi/Datasets/EgoExo-Fitness/gcn_fitness_logits'
+
+#  EXO_LOGITS_DIR: '/home/wchi/Projects/TimeSformer/models/EEF_gen1/rgb_model_by_L/scores_pred'
+#  EXO_LOGITS_DIR_SKL: '//home/wchi/Projects/TimeSformer/models/EEF_gen1/skl_model_by_L/scores_pred'
+
+  SKL_MODEL_BY_LOGITS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1/skl_model_by_L'
+  SKL_MODEL_BY_FEATS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1/skl_model_by_F'
+  SKL_MODEL_BY_FEATS_AND_LOGITS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1/skl_model_by_F_L'
+  RGB_MODEL_BY_LOGITS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1/rgb_model_by_L'
+  RGB_MODEL_BY_FEATS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1/rgb_model_by_F'
+  RGB_MODEL_BY_FEATS_AND_LOGITS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1/rgb_model_by_F_L'
+  MERGED_MODEL: '/home/wchi/Projects/TimeSformer/models/merged_checkpoints/EEF_gen1/TOP_6_model_level_lr01'
+  LOGITS_DIR: 'scores_pred'
+  FEATS_DIR: 'tokens'
+#  FEATS_DIR: 'tokens_feats'
+
+#  SKL_MODEL_BY_LOGITS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1_test/skl_model_by_L'
+#  SKL_MODEL_BY_FEATS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1_test/skl_model_by_F'
+#  SKL_MODEL_BY_FEATS_AND_LOGITS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1_test/skl_model_by_F_L'
+#  RGB_MODEL_BY_LOGITS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1_test/rgb_model_by_L'
+#  RGB_MODEL_BY_FEATS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1_test/rgb_model_by_F'
+#  RGB_MODEL_BY_FEATS_AND_LOGITS: '/home/wchi/Projects/TimeSformer/models/EEF_gen1_test/rgb_model_by_F_L'
+#  LOGITS_DIR: 'scores_pred'
+#  FEATS_DIR: 'tokens'
+
+  NUM_FRAMES: 8
+  SAMPLING_RATE: 32
+  TRAIN_JITTER_SCALES: [256, 320]
+  TRAIN_CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  INPUT_CHANNEL_NUM: [3]
+TIMESFORMER:
+  ATTENTION_TYPE: 'divided_space_time'
+#  PRETRAINED_MODEL: pretrained_models/TimeSformer_divST_8x32_224_K400.pyth
+SOLVER:
+  BASE_LR: 0.005
+  LR_POLICY: steps_with_relative_lrs
+#  LR_POLICY: cosine
+#  LR_POLICY: cosine_sequential
+  STEPS: [0, 11, 14]
+  LRS: [1, 0.1, 0.01]
+  MAX_EPOCH: 15
+#  MAX_EPOCH: 60
+  MOMENTUM: 0.9
+  WEIGHT_DECAY: 1e-4
+  OPTIMIZING_METHOD: sgd
+MODEL:
+  MODEL_NAME: vit_base_patch16_224
+  NUM_CLASSES: 12
+  ARCH: vit
+  LOSS_FUNC: cross_entropy
+  DROPOUT_RATE: 0.5
+TEST:
+  ENABLE: True
+  DATASET: EgoExo_Fitness
+  BATCH_SIZE: 8
+  NUM_ENSEMBLE_VIEWS: 1
+  NUM_SPATIAL_CROPS: 3
+  SAVE_RESULTS_PATH: 'scores_pred'
+#  SAVE_RESULTS_PATH: ""
+DATA_LOADER:
+  NUM_WORKERS: 8
+  PIN_MEMORY: True
+NUM_GPUS: 4
+NUM_SHARDS: 1
+RNG_SEED: 0
+#OUTPUT_DIR: ./models/EgoExo_Fitness_gen2/test
+#OUTPUT_DIR: ./models/EgoExo_Fitness_gen2/Global_best_teacher_average_FL_w5
+#OUTPUT_DIR: ./models/EgoExo_Fitness_gen2/Global_best_teacher_cos_FL_w5_th_4
+OUTPUT_DIR: ./models/merged_checkpoints/EEF_gen2/top_6_w_decay_lr0_02_cos_w10_FL
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_skl_logits_cos_w1
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_RGB_with_logits_cos_w1_corrected
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_SKL_with_logits_cos_w10_corrected
+#OUTPUT_DIR: ./models/egoexo_fitness/exo_pretrained/
+#OUTPUT_DIR: ./models/egoexo_fitness/exo_scratch/
+
+#OUTPUT_DIR: ./models/egoexo_fitness/ego_pretrained_Sequential_DiT_cond_both_ep60_newlr_if10
+
+
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_SKL_with_mask_weight_1_losskd_1x
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_RGB_pretrained_logits_weight_01
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_SKL_pretrained_logits_weight_01
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_SKL_pretrained_wo_valid
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_SKL_online_2
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_SKL_scratch_2
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_RGB_scratch_cos_w5
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_both_pretrained
+#OUTPUT_DIR: ./models/egoexo_fitness/Dist_SKL_RGB_mse_w1_
+#OUTPUT_DIR: ./models/EEF_visual/rgb_skl_logits_gen2
+
+TOKEN_SAVE_DIR: tokens
+SAVE_TOKENS: True
+
+#TRAINING_MODE: 'basic'
+#TRAINING_MODE: 'dist'
+TRAINING_MODE: 'dist_merged'
+#TRAINING_MODE: 'dit'
+
+#TRAINING_SCHEME: [15, 15, 5, 15, 10]
+#TRAINING_SCHEME: [15, 15, 5, 15, 5, 15, 5, 15, 10]
+#TRAINING_SCHEME: [40]
+
+EXO_MODALITY: ['logits', 'feats']
+#EXO_MODALITY: ['logits','logits_skl']
+#EXO_MODALITY: ['rgb']
+#EXO_MODALITY: ['skl']
+#EXO_MODALITY: ['rgb', 'logits']
+#EXO_MODALITY: ['skl', 'logits']
+#EXO_MODALITY: 'both'
+#EXO_MODALITY : ['skl', 'rgb']
+#EXO_MODALITY: ['logits']
+#EXO_MODALITY: ['feats']
+#EXO_MODALITY: ['auto']
+#EXO_MODALITY: ['logits', 'feats', 'random']
+#EXO_MODALITY: ['logits', 'feats', 'average']
+
+GENERATION: 'gen2' # 'gen1' or 'gen2'
+LOSS_TYPE: 'cosine'
+#LOSS_TYPE: 'mse'
+LOSS_WEIGHT: 1.0
+LOSS_WEIGHT_FEATS: 10.0
+LOSS_WEIGHT_LOGITS: 10.0
+DIST_THRESHOLD: 4.0
+TOP_K: 3
+
+
+#----------Check List-------------
+# 1) DATA.PATH_TO_DATA_DIR
+# 2) OUTPUT_DIR
+# 3) SAVE_TOKENS
+# 4) TRAINING_MODE
+# 5) TRAINING_SCHEME
+# 6) EXO_MODALITY
+#---------------------------------

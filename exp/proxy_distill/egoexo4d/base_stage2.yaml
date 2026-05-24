@@ -1,0 +1,83 @@
+# Common Stage 2 / merge config for proxy-gen2.
+TRAIN:
+  ENABLE: False
+  DATASET: Egoexo4d_proxy_gen2
+  BATCH_SIZE: 8
+  EVAL_PERIOD: 5
+  CHECKPOINT_PERIOD: 5
+  AUTO_RESUME: False
+TEST:
+  ENABLE: False
+  DATASET: Egoexo4d_proxy_gen2
+  BATCH_SIZE: 8
+  NUM_ENSEMBLE_VIEWS: 10
+  NUM_SPATIAL_CROPS: 3
+  SAVE_RESULTS_PATH: 'scores_pred'
+DATA:
+  PATH_TO_DATA_DIR: './data/EgoExo4D/annotations/csvs/keystep_segments/ego'
+  PATH_PREFIX: './data/EgoExo4D/keystep_segments_paired'
+  SKL_MODEL_BY_FEATS: './data/EgoExo4D/distillation/exo_skl'
+  RGB_MODEL_BY_FEATS: './data/EgoExo4D/distillation/exo_rgb'
+  EXO_SIGLIP_BY_FEATS: './data/EgoExo4D/distillation/exo_siglip'
+  EGO_SIGLIP_BY_FEATS: './data/EgoExo4D/distillation/ego_siglip'
+  EXO_SKEGO_BY_FEATS: './data/EgoExo4D/distillation/exo_skego'
+  EGO_DEPTH_BY_FEATS: './data/EgoExo4D/distillation/ego_depth'
+  EXO_DEPTH_BY_FEATS: './data/EgoExo4D/distillation/exo_depth'
+  EGO_DINO_BY_FEATS: './data/EgoExo4D/distillation/ego_dino'
+  EXO_DINO_BY_FEATS: './data/EgoExo4D/distillation/exo_dino'
+  FEATS_DIR: 'features'
+  PROXY_CANDIDATE_ROOT: './models/EgoExo_4D_pi_ego/stage1'
+  PROXY_CANDIDATES: ['exo_rgb', 'exo_skl', 'exo_siglip', 'ego_siglip', 'exo_skego', 'ego_depth', 'exo_depth', 'exo_dino', 'ego_dino']
+  PROXY_LOGITS_DIR: 'tokens_training/scores_pred'
+  PROXY_FEATS_DIR: 'tokens_training/tokens'
+  NUM_FRAMES: 8
+  SAMPLING_RATE: 32
+  TRAIN_JITTER_SCALES: [256, 320]
+  TRAIN_CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  INPUT_CHANNEL_NUM: [3]
+
+TIMESFORMER:
+  ATTENTION_TYPE: 'divided_space_time'
+MODEL:
+  MODEL_NAME: pi_proxy_vit
+  NUM_CLASSES: 665
+  ARCH: vit
+  LOSS_FUNC: cross_entropy
+  DROPOUT_RATE: 0.5
+
+SOLVER:
+  BASE_LR: 0.005
+  LR_POLICY: steps_with_relative_lrs
+  STEPS: [0, 11, 14]
+  LRS: [1, 0.1, 0.01]
+  MAX_EPOCH: 15
+  MOMENTUM: 0.9
+  WEIGHT_DECAY: 1e-4
+  OPTIMIZING_METHOD: sgd
+DATA_LOADER:
+  NUM_WORKERS: 8
+  PIN_MEMORY: True
+TENSORBOARD:
+  ENABLE: False
+NUM_GPUS: 4
+NUM_SHARDS: 1
+RNG_SEED: 0
+
+OUTPUT_DIR: './models/EgoExo_4D_pi_ego_gen2/dist_top1_from_merged'
+GENERATION: 'proxy_gen2'
+TRAINING_MODE: 'dist'
+EXO_MODALITY: ['feats', 'logits']
+LOSS_TYPE: 'cosine'
+LOSS_WEIGHT: 5.0
+LOSS_WEIGHT_FEATS: 5.0
+LOSS_WEIGHT_LOGITS: 5.0
+DIST_THRESHOLD: 4.0
+DIST_REQUIRE_TEACHER_CORRECT: True
+TOP_K: 9
+MERGE_TOP_K: 9
+MERGE_OUTPUT_PATH: './models/EgoExo_4D_pi_ego/merged_checkpoints/merged_top_9_model.pyth'
+GROUP_TOPK_BY_VIEW: False
+SAVE_TOKENS: False
+TOKEN_SAVE_DIR: 'tokens_training/tokens'
+MERGE_LEVEL: 'model'

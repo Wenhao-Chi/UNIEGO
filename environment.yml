@@ -1,0 +1,28 @@
+name: uniego
+channels:
+- pytorch
+- conda-forge
+- defaults
+dependencies:
+- python=3.9
+- jupyterlab
+- pandas>=1.2
+- numpy>=1.21,<2
+- pytorch>=1.13
+- torchvision>=0.14
+- scikit-learn>=0.22
+- scipy>=1.7
+- opencv>=4.2
+- pyyaml>=5.1
+- yacs>=0.1.6
+- einops>=0.3
+- av
+- tensorboard
+- psutil
+- tqdm
+- matplotlib
+- simplejson
+- pip
+- pip:
+  - fvcore
+  - timm

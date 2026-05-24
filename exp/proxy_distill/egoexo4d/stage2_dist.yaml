@@ -1,0 +1,10 @@
+# Stage 2: train proxy-gen2 from the merged stage1 checkpoint.
+_BASE_: base_stage2.yaml
+
+TRAIN:
+  ENABLE: True
+  CHECKPOINT_FILE_PATH: './models/EgoExo_4D_pi_ego/merged_checkpoints/merged_top_9_model.pyth'
+  CHECKPOINT_EPOCH_RESET: True
+TEST:
+  ENABLE: True
+TRAINING_MODE: 'dist'

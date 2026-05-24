@@ -1,0 +1,9 @@
+# Run gen1 proxy inference for teacher delta: exo_depth.
+_BASE_: base_infer_gen1.yaml
+
+DATA:
+  TEST_SPLIT: 'train'
+TEST:
+  CHECKPOINT_FILE_PATH: './models/EgoExo_Fitness_pi_ego/stage1/exo_depth/checkpoints/checkpoint_epoch_{SOLVER.MAX_EPOCH:05d}.pyth'
+OUTPUT_DIR: './models/EgoExo_Fitness_pi_ego/stage1/exo_depth'
+EXO_MODALITY: ['exo_depth']

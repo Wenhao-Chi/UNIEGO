@@ -1,0 +1,132 @@
+TRAIN:
+  ENABLE: True
+#  DATASET: Assembly101
+  DATASET: Assembly101_gen2
+  BATCH_SIZE: 8
+#  BATCH_SIZE: 64
+  EVAL_PERIOD: 5
+  CHECKPOINT_PERIOD: 5
+  AUTO_RESUME: True
+DATA:
+  PATH_TO_DATA_DIR: '/home/wchi/Datasets/Assembly101/fine-grained-segments/Ego'
+#  PATH_TO_DATA_DIR: '/home/wchi/Datasets/Assembly101/fine-grained-segments/Ego_swap_train_test/'
+#  PATH_TO_DATA_DIR: '/home/wchi/Datasets/Assembly101/fine-grained-segments/Exo'
+#  PATH_TO_DATA_DIR: '/home/wchi/Datasets/Assembly101/fine-grained-segments/Exo_swap_train_test/'
+  PATH_PREFIX: '/home/wchi/Datasets/Assembly101/fine-grained-segments'
+  EXO_FEAT_DIR: '/home/wchi/Projects/TimeSformer/image_tokens/assembly101_tokens_exo'
+  EXO_FEAT_DIR_SKL: '/home/wchi/Projects/pyskl/gcn_tokens_Assembly101/train_Jan'
+#  EXO_FEAT_DIR: '/home/wchi/Projects/TimeSformer/models/A101_ego_output/Dist_Logits_rgb/tokens'
+#  EXO_FEAT_DIR_SKL: '/home/wchi/Projects/TimeSformer/models/A101_ego_output/Dist_SKL_with_Logits/tokens'
+#  EXO_FEAT_DIR_SKL: '/home/wchi/Projects/pyskl/gcn_tokens_Assembly101/train_NVC'
+#  EXO_LOGITS_DIR: '/home/wchi/Projects/TimeSformer/models/Assembly101/exo_scratch_2/scores_pred_exo_logits'
+  EXO_LOGITS_DIR: '/home/wchi/Datasets/Assembly101/gcn_assembly101_logits'
+#  EXO_LOGITS_DIR: '/home/wchi/Projects/TimeSformer/models/A101_ego_output/Dist_Logits_rgb/scores_pred'
+#  EXO_LOGITS_DIR_SKL: '/home/wchi/Projects/TimeSformer/models/A101_ego_output/Dist_SKL_with_Logits/scores_pred'
+
+  SKL_MODEL_BY_LOGITS: '/home/wchi/Projects/TimeSformer/models/A101_gen1/skl_model_by_L'
+  SKL_MODEL_BY_FEATS: '/home/wchi/Projects/TimeSformer/models/A101_gen1/skl_model_by_F'
+  SKL_MODEL_BY_FEATS_AND_LOGITS: '/home/wchi/Projects/TimeSformer/models/A101_gen1/skl_model_by_F_L'
+  RGB_MODEL_BY_LOGITS: '/home/wchi/Projects/TimeSformer/models/A101_gen1/rgb_model_by_L'
+  RGB_MODEL_BY_FEATS: '/home/wchi/Projects/TimeSformer/models/A101_gen1/rgb_model_by_F'
+  RGB_MODEL_BY_FEATS_AND_LOGITS: '/home/wchi/Projects/TimeSformer/models/A101_gen1/rgb_model_by_F_L'
+  LOGITS_DIR: 'scores_pred'
+  FEATS_DIR: 'tokens'
+
+#  SKL_MODEL_BY_LOGITS: '/home/wchi/Projects/TimeSformer/models/A101_gen1_test/skl_model_by_L'
+#  SKL_MODEL_BY_FEATS: '/home/wchi/Projects/TimeSformer/models/A101_gen1_test/skl_model_by_F'
+#  SKL_MODEL_BY_FEATS_AND_LOGITS: '/home/wchi/Projects/TimeSformer/models/A101_gen1_test/skl_model_by_F_L'
+#  RGB_MODEL_BY_LOGITS: '/home/wchi/Projects/TimeSformer/models/A101_gen1_test/rgb_model_by_L'
+#  RGB_MODEL_BY_FEATS: '/home/wchi/Projects/TimeSformer/models/A101_gen1_test/rgb_model_by_F'
+#  RGB_MODEL_BY_FEATS_AND_LOGITS: '/home/wchi/Projects/TimeSformer/models/A101_gen1_test/rgb_model_by_F_L'
+#  LOGITS_DIR: 'scores_pred_test'
+#  FEATS_DIR: 'tokens_test'
+
+  NUM_FRAMES: 8
+  SAMPLING_RATE: 32
+  TRAIN_JITTER_SCALES: [256, 320]
+  TRAIN_CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  INPUT_CHANNEL_NUM: [3]
+TIMESFORMER:
+  ATTENTION_TYPE: 'divided_space_time'
+#  PRETRAINED_MODEL: pretrained_models/TimeSformer_divST_8x32_224_K400.pyth
+SOLVER:
+  BASE_LR: 0.005
+  LR_POLICY: steps_with_relative_lrs
+#  LR_POLICY: cosine
+#  LR_POLICY: cosine_sequential
+  STEPS: [0, 11, 14]
+  LRS: [1, 0.1, 0.01]
+  MAX_EPOCH: 15
+#  MAX_EPOCH: 100
+  MOMENTUM: 0.9
+  WEIGHT_DECAY: 1e-4
+  OPTIMIZING_METHOD: sgd
+MODEL:
+  MODEL_NAME: vit_base_patch16_224
+  NUM_CLASSES: 24
+  ARCH: vit
+  LOSS_FUNC: cross_entropy
+  DROPOUT_RATE: 0.5
+TEST:
+  ENABLE: True
+  DATASET: Assembly101
+  BATCH_SIZE: 8
+  NUM_ENSEMBLE_VIEWS: 1
+  NUM_SPATIAL_CROPS: 3
+  SAVE_RESULTS_PATH: 'scores_pred'
+DATA_LOADER:
+  NUM_WORKERS: 8
+  PIN_MEMORY: True
+NUM_GPUS: 4
+NUM_SHARDS: 1
+RNG_SEED: 0
+
+#OUTPUT_DIR: ./models/Assembly101_Gen2/Global_best_teacher_random_FL_w5
+#OUTPUT_DIR: ./models/Assembly101_Gen2/Global_best_teacher_cos_follow_w5
+OUTPUT_DIR: ./models/Assembly101_Gen2/Optimization_Feature_cos_F_w10_L_w10_th_4_TOP_3
+#OUTPUT_DIR: ./models/Assembly101_Gen2/Global_best_teacher_cos_FL_w5_th_4
+
+#OUTPUT_DIR: ./models/Assembly101/ego_pretrained_Sequential_DiT_cond_both_ep100
+#OUTPUT_DIR: ./models/Assembly101/ego_pretrained_Sequential_DiT_cond_cross_ep100_if5
+#OUTPUT_DIR: ./models/Assembly101/ego_pretrained_Sequential_DiT_cond_both_ep100_if5
+
+TOKEN_SAVE_DIR: tokens
+SAVE_TOKENS: True
+
+#TRAINING_MODE: 'basic'
+TRAINING_MODE: 'dist'
+#TRAINING_MODE: 'dit'
+
+#TRAINING_SCHEME: [15, 15, 5, 15, 5, 15, 5, 15, 10]
+
+#EXO_MODALITY: ['logits', 'skl']
+#EXO_MODALITY: ['logits', 'rgb']
+#EXO_MODALITY: ['logits']
+#EXO_MODALITY: ['feats']
+#EXO_MODALITY: ['logits', 'logits_skl']
+#EXO_MODALITY: ['skl']
+#EXO_MODALITY: ['rgb']
+#EXO_MODALITY: ['skl', 'rgb']
+#EXO_MODALITY: ['auto']
+EXO_MODALITY: ['logits', 'feats']
+#EXO_MODALITY: ['logits', 'feats', 'random']
+#EXO_MODALITY: ['logits', 'feats', 'average']
+
+GENERATION: 'gen2' # 'gen1' or 'gen2'
+LOSS_TYPE: 'cosine'
+#LOSS_TYPE: 'mse'
+#LOSS_WEIGHT: 50.0
+LOSS_WEIGHT_FEATS: 10.0
+LOSS_WEIGHT_LOGITS: 10.0
+DIST_THRESHOLD: 4.0
+TOP_K: 3
+
+
+#----------Check List-------------
+# 1) DATA.PATH_TO_DATA_DIR
+# 2) OUTPUT_DIR
+# 3) SAVE_TOKENS
+# 4) TRAINING_MODE
+# 5) EXO_MODALITY
+#---------------------------------

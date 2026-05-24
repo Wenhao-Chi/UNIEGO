@@ -1,0 +1,5 @@
+# Stage 1 teacher delta: ego_dino.
+_BASE_: base_stage1.yaml
+
+OUTPUT_DIR: './models/Assembly101_pi_ego/stage1/ego_dino'
+EXO_MODALITY: ['ego_dino']
