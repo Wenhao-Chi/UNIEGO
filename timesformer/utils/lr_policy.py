@@ -48,11 +48,11 @@ def lr_func_cosine(cfg, cur_epoch):
 
 def lr_func_cosine_sequential(cfg, cur_epoch):
     accum = 0
-    for i, duration in enumerate(cfg.TRAINING_SCHEME):
+    for i, duration in enumerate(cfg.UNIEGO.TRAINING_SCHEME):
         if cur_epoch < accum + duration:
             start_idx = 0 if i % 2 == 0 else 1
-            total_epochs = sum(cfg.TRAINING_SCHEME[start_idx::2])
-            past_epochs = sum(cfg.TRAINING_SCHEME[start_idx:i:2])
+            total_epochs = sum(cfg.UNIEGO.TRAINING_SCHEME[start_idx::2])
+            past_epochs = sum(cfg.UNIEGO.TRAINING_SCHEME[start_idx:i:2])
             progress = (past_epochs + cur_epoch - accum) / max(total_epochs, 1e-5)
             progress = min(max(progress, 0.0), 1.0)
             return (

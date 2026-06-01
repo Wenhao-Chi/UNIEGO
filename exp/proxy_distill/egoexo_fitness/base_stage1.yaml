@@ -1,4 +1,5 @@
-# Common Stage 1 config for one UNIEGO proxy candidate.
+# Stage 1 single-teacher proxy training config for EgoExo-Fitness.
+# run_pipeline.py overrides OUTPUT_DIR and EXO_MODALITY for each teacher.
 TRAIN:
   ENABLE: True
   DATASET: Egoexo_fitness_proxy
@@ -6,12 +7,15 @@ TRAIN:
   EVAL_PERIOD: 5
   CHECKPOINT_PERIOD: 5
   AUTO_RESUME: True
+  CHECKPOINT_FILE_PATH: ''
+  CHECKPOINT_EPOCH_RESET: False
 TEST:
   ENABLE: True
   DATASET: Egoexo_fitness_proxy
   BATCH_SIZE: 8
   NUM_ENSEMBLE_VIEWS: 1
   NUM_SPATIAL_CROPS: 3
+  CHECKPOINT_FILE_PATH: ''
   SAVE_RESULTS_PATH: 'scores_pred'
 DATA:
   PATH_TO_DATA_DIR: './data/EgoExo-Fitness/vclip'
@@ -30,6 +34,7 @@ DATA:
   PROXY_CANDIDATES: ['exo_rgb', 'exo_skl', 'exo_siglip', 'ego_siglip', 'exo_skego', 'ego_depth', 'exo_depth', 'exo_dino', 'ego_dino']
   PROXY_LOGITS_DIR: 'tokens_training/scores_pred'
   PROXY_FEATS_DIR: 'tokens_training/tokens'
+  TEST_SPLIT: 'test'
   NUM_FRAMES: 8
   SAMPLING_RATE: 32
   TRAIN_JITTER_SCALES: [256, 320]
@@ -64,16 +69,20 @@ NUM_GPUS: 4
 NUM_SHARDS: 1
 RNG_SEED: 0
 
-GENERATION: 'proxy'
-TRAINING_MODE: 'dist'
-LOSS_TYPE: 'cosine'
-LOSS_WEIGHT: 5.0
-LOSS_WEIGHT_FEATS: 5.0
-LOSS_WEIGHT_LOGITS: 10.0
-DIST_THRESHOLD: 4.0
-DIST_REQUIRE_TEACHER_CORRECT: True
-TOP_K: 1
-GROUP_TOPK_BY_VIEW: False
-SAVE_TOKENS: False
-TOKEN_SAVE_DIR: 'tokens_training/tokens'
-MERGE_LEVEL: 'model'
+OUTPUT_DIR: './models/EgoExo_Fitness_pi_ego/stage1/exo_rgb'
+LOG_FILE: 'stdout_train.log'
+UNIEGO:
+  GENERATION: 'proxy'
+  TRAINING_MODE: 'dist'
+  EXO_MODALITY: ['exo_rgb']
+  TOP_K: 1
+  GROUP_TOPK_BY_VIEW: False
+  LOSS_TYPE: 'cosine'
+  LOSS_WEIGHT: 1.0
+  LOSS_WEIGHT_FEATS: 5.0
+  LOSS_WEIGHT_LOGITS: 0.0
+  DIST_THRESHOLD: 4.0
+  DIST_REQUIRE_TEACHER_CORRECT: True
+  SAVE_TOKENS: False
+  TOKEN_SAVE_DIR: 'tokens_training/tokens'
+  MERGE_LEVEL: 'model'

@@ -29,7 +29,7 @@ logger = logging.get_logger(__name__)
 
 def get_distill_modalities(exo_modality):
     """
-    Normalize cfg.EXO_MODALITY and keep one or more modalities for proxy distillation.
+    Normalize cfg.UNIEGO.EXO_MODALITY and keep one or more modalities for proxy distillation.
     """
     if isinstance(exo_modality, str):
         modalities = [exo_modality] if exo_modality else []
@@ -37,7 +37,7 @@ def get_distill_modalities(exo_modality):
         modalities = [modality for modality in exo_modality if modality]
 
     if not modalities:
-        raise ValueError("train_proxy requires cfg.EXO_MODALITY to contain at least one modality.")
+        raise ValueError("train_proxy requires cfg.UNIEGO.EXO_MODALITY to contain at least one modality.")
 
     return list(dict.fromkeys(modalities))
 
@@ -143,7 +143,7 @@ def train_epoch(
 
     cur_global_batch_size = cfg.NUM_SHARDS * cfg.TRAIN.BATCH_SIZE
     num_iters = cfg.GLOBAL_BATCH_SIZE // cur_global_batch_size
-    selected_modalities = get_distill_modalities(cfg.EXO_MODALITY)
+    selected_modalities = get_distill_modalities(cfg.UNIEGO.EXO_MODALITY)
 
     for cur_iter, (inputs, labels, _, meta) in enumerate(train_loader):
         # Transfer the data to the current GPU device.
@@ -185,9 +185,9 @@ def train_epoch(
         loss = loss_fun(preds, labels)
         loss_cls = loss
         extra_stats["loss_cls"] = loss.item()
-        if cfg.TRAINING_MODE == 'basic':
+        if cfg.UNIEGO.TRAINING_MODE == 'basic':
             pass
-        elif cfg.TRAINING_MODE == 'dist':
+        elif cfg.UNIEGO.TRAINING_MODE == 'dist':
             student_token_dict = build_student_token_dict(tokens, aux_tokens, selected_modalities)
             loss_feat_values = []
 
@@ -196,8 +196,8 @@ def train_epoch(
                 loss_feat = calculate_dist_loss(
                     student_token=student_token_dict[selected_modality],
                     teacher_tokens=selected_feats,
-                    loss_type=cfg.LOSS_TYPE,
-                    loss_weight=cfg.LOSS_WEIGHT,
+                    loss_type=cfg.UNIEGO.LOSS_TYPE,
+                    loss_weight=cfg.UNIEGO.LOSS_WEIGHT,
                 )
                 # breakpoint()
                 extra_stats[f"loss_dist_{selected_modality}_feat"] = loss_feat.item()
@@ -209,7 +209,7 @@ def train_epoch(
         else:
             raise ValueError(
                 f"train_proxy only supports TRAINING_MODE 'basic' or 'dist', "
-                f"but got '{cfg.TRAINING_MODE}'"
+                f"but got '{cfg.UNIEGO.TRAINING_MODE}'"
             )
 
         if cfg.MIXUP.ENABLED:
@@ -365,8 +365,8 @@ def eval_epoch(val_loader, model, val_meter, cur_epoch, cfg, writer=None):
 
         val_meter.update_predictions(preds, labels)
         
-        if cfg.SAVE_TOKENS:
-            token_save_dir = os.path.join(cfg.OUTPUT_DIR, cfg.TOKEN_SAVE_DIR)
+        if cfg.UNIEGO.SAVE_TOKENS:
+            token_save_dir = os.path.join(cfg.OUTPUT_DIR, cfg.UNIEGO.TOKEN_SAVE_DIR)
             os.makedirs(token_save_dir, exist_ok=True)
             if isinstance(aux_tokens, dict):
                 for modality_name, modality_tokens in aux_tokens.items():
@@ -490,7 +490,7 @@ def train(cfg):
     torch.manual_seed(cfg.RNG_SEED)
 
     # Setup logging format.
-    logging.setup_logging(cfg.OUTPUT_DIR)
+    logging.setup_logging(cfg.OUTPUT_DIR, cfg.LOG_FILE)
 
     # Init multigrid.
     multigrid = None

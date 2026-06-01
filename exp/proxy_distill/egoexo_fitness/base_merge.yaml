@@ -1,36 +1,35 @@
-# Stage 2 proxy-gen2 training config for EgoExo4D.
-# exp/proxy_distill/run_pipeline.py overrides DATA.PROXY_CANDIDATES when needed.
+# Merge Stage 1 proxy checkpoints into the Stage 2 initialization for EgoExo-Fitness.
 TRAIN:
-  ENABLE: True
-  DATASET: Egoexo4d_proxy_gen2
+  ENABLE: False
+  DATASET: Egoexo_fitness_proxy_gen2
   BATCH_SIZE: 8
   EVAL_PERIOD: 5
   CHECKPOINT_PERIOD: 5
   AUTO_RESUME: False
-  CHECKPOINT_FILE_PATH: './models/EgoExo_4D_pi_ego/merged_checkpoints/merged_top_9_model.pyth'
-  CHECKPOINT_EPOCH_RESET: True
+  CHECKPOINT_FILE_PATH: ''
+  CHECKPOINT_EPOCH_RESET: False
 TEST:
-  ENABLE: True
-  DATASET: Egoexo4d_proxy_gen2
+  ENABLE: False
+  DATASET: Egoexo_fitness_proxy_gen2
   BATCH_SIZE: 8
-  NUM_ENSEMBLE_VIEWS: 10
+  NUM_ENSEMBLE_VIEWS: 1
   NUM_SPATIAL_CROPS: 3
   CHECKPOINT_FILE_PATH: ''
   SAVE_RESULTS_PATH: 'scores_pred'
 DATA:
-  PATH_TO_DATA_DIR: './data/EgoExo4D/annotations/csvs/keystep_segments/ego'
-  PATH_PREFIX: './data/EgoExo4D/keystep_segments_paired'
-  SKL_MODEL_BY_FEATS: './data/EgoExo4D/distillation/exo_skl'
-  RGB_MODEL_BY_FEATS: './data/EgoExo4D/distillation/exo_rgb'
-  EXO_SIGLIP_BY_FEATS: './data/EgoExo4D/distillation/exo_siglip'
-  EGO_SIGLIP_BY_FEATS: './data/EgoExo4D/distillation/ego_siglip'
-  EXO_SKEGO_BY_FEATS: './data/EgoExo4D/distillation/exo_skego'
-  EGO_DEPTH_BY_FEATS: './data/EgoExo4D/distillation/ego_depth'
-  EXO_DEPTH_BY_FEATS: './data/EgoExo4D/distillation/exo_depth'
-  EGO_DINO_BY_FEATS: './data/EgoExo4D/distillation/ego_dino'
-  EXO_DINO_BY_FEATS: './data/EgoExo4D/distillation/exo_dino'
+  PATH_TO_DATA_DIR: './data/EgoExo-Fitness/vclip'
+  PATH_PREFIX: './data/EgoExo-Fitness/videos_subaction'
+  SKL_MODEL_BY_FEATS: './data/EgoExo-Fitness/distillation/exo_skl'
+  RGB_MODEL_BY_FEATS: './data/EgoExo-Fitness/distillation/exo_rgb'
+  EXO_SIGLIP_BY_FEATS: './data/EgoExo-Fitness/distillation/exo_siglip'
+  EGO_SIGLIP_BY_FEATS: './data/EgoExo-Fitness/distillation/ego_siglip'
+  EXO_SKEGO_BY_FEATS: './data/EgoExo-Fitness/distillation/exo_skego'
+  EGO_DEPTH_BY_FEATS: './data/EgoExo-Fitness/distillation/ego_depth'
+  EXO_DEPTH_BY_FEATS: './data/EgoExo-Fitness/distillation/exo_depth'
+  EGO_DINO_BY_FEATS: './data/EgoExo-Fitness/distillation/ego_dino'
+  EXO_DINO_BY_FEATS: './data/EgoExo-Fitness/distillation/exo_dino'
   FEATS_DIR: 'features'
-  PROXY_CANDIDATE_ROOT: './models/EgoExo_4D_pi_ego/stage1'
+  PROXY_CANDIDATE_ROOT: './models/EgoExo_Fitness_pi_ego/stage1'
   PROXY_CANDIDATES: ['exo_rgb', 'exo_skl', 'exo_siglip', 'ego_siglip', 'exo_skego', 'ego_depth', 'exo_depth', 'exo_dino', 'ego_dino']
   PROXY_LOGITS_DIR: 'tokens_training/scores_pred'
   PROXY_FEATS_DIR: 'tokens_training/tokens'
@@ -46,7 +45,7 @@ TIMESFORMER:
   ATTENTION_TYPE: 'divided_space_time'
 MODEL:
   MODEL_NAME: pi_proxy_vit
-  NUM_CLASSES: 665
+  NUM_CLASSES: 12
   ARCH: vit
   LOSS_FUNC: cross_entropy
   DROPOUT_RATE: 0.5
@@ -69,12 +68,13 @@ NUM_GPUS: 4
 NUM_SHARDS: 1
 RNG_SEED: 0
 
-OUTPUT_DIR: './models/EgoExo_4D_pi_ego_gen2/dist_top2_from_merged'
+OUTPUT_DIR: './models/EgoExo_Fitness_pi_ego/merged_checkpoints'
+LOG_FILE: 'stdout.log'
 UNIEGO:
   GENERATION: 'proxy_gen2'
   TRAINING_MODE: 'dist'
   EXO_MODALITY: ['feats', 'logits']
-  TOP_K: 2
+  TOP_K: 1
   GROUP_TOPK_BY_VIEW: False
   LOSS_TYPE: 'cosine'
   LOSS_WEIGHT: 1.0
@@ -86,4 +86,4 @@ UNIEGO:
   TOKEN_SAVE_DIR: 'tokens_training/tokens'
   MERGE_LEVEL: 'model'
   MERGE_TOP_K: 9
-  MERGE_OUTPUT_PATH: './models/EgoExo_4D_pi_ego/merged_checkpoints/merged_top_9_model.pyth'
+  MERGE_OUTPUT_PATH: './models/EgoExo_Fitness_pi_ego/merged_checkpoints/merged_top_9_model.pyth'

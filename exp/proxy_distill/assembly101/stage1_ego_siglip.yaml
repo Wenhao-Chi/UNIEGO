@@ -1,5 +1,0 @@
-# Stage 1 teacher delta: ego_siglip.
-_BASE_: base_stage1.yaml
-
-OUTPUT_DIR: './models/Assembly101_pi_ego/stage1/ego_siglip'
-EXO_MODALITY: ['ego_siglip']

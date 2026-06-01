@@ -275,11 +275,11 @@ def train_epoch(
     num_iters = cfg.GLOBAL_BATCH_SIZE // cur_global_batch_size
     candidate_names = (
         get_proxy_candidate_names(cfg.DATA.PROXY_CANDIDATES)
-        if cfg.TRAINING_MODE == "dist"
+        if cfg.UNIEGO.TRAINING_MODE == "dist"
         else []
     )
-    top_k = min(cfg.TOP_K, len(candidate_names)) if candidate_names else 0
-    use_feat_branch, use_logits_branch, use_random_candidates = get_proxy_branch_flags(cfg.EXO_MODALITY)
+    top_k = min(cfg.UNIEGO.TOP_K, len(candidate_names)) if candidate_names else 0
+    use_feat_branch, use_logits_branch, use_random_candidates = get_proxy_branch_flags(cfg.UNIEGO.EXO_MODALITY)
     epoch_selection_counts = init_candidate_selection_counts(candidate_names)
 
     for cur_iter, (inputs, labels, _, meta) in enumerate(train_loader):
@@ -322,9 +322,9 @@ def train_epoch(
         loss_cls = loss
         extra_stats["loss_cls"] = loss.item()
 
-        if cfg.TRAINING_MODE == "basic":
+        if cfg.UNIEGO.TRAINING_MODE == "basic":
             pass
-        elif cfg.TRAINING_MODE == "dist":
+        elif cfg.UNIEGO.TRAINING_MODE == "dist":
             all_feats, all_logits = build_candidate_tensors(meta, candidate_names)
             feats_stack = torch.stack(all_feats, dim=1)
             logits_stack = torch.stack(all_logits, dim=1)
@@ -342,11 +342,11 @@ def train_epoch(
             teacher_preds = logits_stack.argmax(dim=-1)
 
             correct_mask = teacher_preds == target_labels.unsqueeze(1)
-            if cfg.DIST_REQUIRE_TEACHER_CORRECT:
+            if cfg.UNIEGO.DIST_REQUIRE_TEACHER_CORRECT:
                 valid_mask = correct_mask
             else:
                 valid_mask = torch.ones_like(correct_mask, dtype=torch.bool)
-            valid_mask = valid_mask & (ce_stack < student_ce.unsqueeze(1)) & (ce_stack <= cfg.DIST_THRESHOLD)
+            valid_mask = valid_mask & (ce_stack < student_ce.unsqueeze(1)) & (ce_stack <= cfg.UNIEGO.DIST_THRESHOLD)
             masked_ce = torch.where(valid_mask, ce_stack, torch.full_like(ce_stack, float("inf")))
             topk_ce, topk_idx = select_topk_candidates(masked_ce, top_k, candidate_group_indices, largest=False)
             selected_teacher_count = topk_idx.size(1)
@@ -374,8 +374,8 @@ def train_epoch(
                     step_loss_feat = calculate_dist_loss(
                         student_token=tokens,
                         teacher_tokens=curr_feats,
-                        loss_type=cfg.LOSS_TYPE,
-                        loss_weight=cfg.LOSS_WEIGHT_FEATS,
+                        loss_type=cfg.UNIEGO.LOSS_TYPE,
+                        loss_weight=cfg.UNIEGO.LOSS_WEIGHT_FEATS,
                         reduction="none",
                     )
                     loss_dist_feat_per_sample += curr_weight * step_loss_feat
@@ -384,7 +384,7 @@ def train_epoch(
                     step_loss_logits = calculate_logits_dist_loss(
                         student_logits=preds,
                         teacher_logits=curr_logits,
-                        loss_weight=cfg.LOSS_WEIGHT_LOGITS,
+                        loss_weight=cfg.UNIEGO.LOSS_WEIGHT_LOGITS,
                         reduction="none",
                     )
                     loss_dist_logits_per_sample += curr_weight * step_loss_logits
@@ -414,7 +414,7 @@ def train_epoch(
         else:
             raise ValueError(
                 "train_proxy_gen2 only supports TRAINING_MODE 'basic' or 'dist', "
-                f"but got '{cfg.TRAINING_MODE}'"
+                f"but got '{cfg.UNIEGO.TRAINING_MODE}'"
             )
 
         if cfg.MIXUP.ENABLED:
@@ -518,8 +518,8 @@ def eval_epoch(val_loader, model, val_meter, cur_epoch, cfg, writer=None):
 
         val_meter.update_predictions(preds, labels)
 
-        if cfg.SAVE_TOKENS:
-            token_save_dir = os.path.join(cfg.OUTPUT_DIR, cfg.TOKEN_SAVE_DIR)
+        if cfg.UNIEGO.SAVE_TOKENS:
+            token_save_dir = os.path.join(cfg.OUTPUT_DIR, cfg.UNIEGO.TOKEN_SAVE_DIR)
             os.makedirs(token_save_dir, exist_ok=True)
             for name, token in zip(meta["filename"], tokens.detach().cpu().numpy()):
                 save_path = os.path.join(token_save_dir, f"{name}.npy")
@@ -577,7 +577,7 @@ def train(cfg):
 
     np.random.seed(cfg.RNG_SEED)
     torch.manual_seed(cfg.RNG_SEED)
-    logging.setup_logging(cfg.OUTPUT_DIR)
+    logging.setup_logging(cfg.OUTPUT_DIR, cfg.LOG_FILE)
 
     multigrid = None
     if cfg.MULTIGRID.LONG_CYCLE or cfg.MULTIGRID.SHORT_CYCLE:
@@ -591,13 +591,13 @@ def train(cfg):
     candidate_names = []
     total_selection_counts = {}
     candidate_group_indices = None
-    if cfg.TRAINING_MODE == "dist":
+    if cfg.UNIEGO.TRAINING_MODE == "dist":
         candidate_names = get_proxy_candidate_names(cfg.DATA.PROXY_CANDIDATES)
-        if cfg.GROUP_TOPK_BY_VIEW:
+        if cfg.UNIEGO.GROUP_TOPK_BY_VIEW:
             candidate_group_indices = build_candidate_group_indices(candidate_names)
         total_selection_counts = init_candidate_selection_counts(candidate_names)
         logger.info("Proxy candidate teachers: %s", candidate_names)
-        if cfg.GROUP_TOPK_BY_VIEW and candidate_group_indices is not None:
+        if cfg.UNIEGO.GROUP_TOPK_BY_VIEW and candidate_group_indices is not None:
             logger.info("Enabled grouped top-k selection by ego/exo view.")
 
     model = build_model(cfg)

@@ -183,9 +183,9 @@ class pi_proxy_vit(nn.Module):
             drop_path_rate=0.1,
             num_frames=cfg.DATA.NUM_FRAMES,
             attention_type=cfg.TIMESFORMER.ATTENTION_TYPE,
-            exo_modality=cfg.EXO_MODALITY,
-            training_mode=cfg.TRAINING_MODE,
-            same_dim_proxy_proj=(cfg.GENERATION == 'proxy_gen2'),
+            exo_modality=cfg.UNIEGO.EXO_MODALITY,
+            training_mode=cfg.UNIEGO.TRAINING_MODE,
+            same_dim_proxy_proj=(cfg.UNIEGO.GENERATION == 'proxy_gen2'),
             **kwargs,
         )
 

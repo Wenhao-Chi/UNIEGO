@@ -1,5 +1,0 @@
-# Stage 1 teacher delta: exo_rgb.
-_BASE_: base_stage1.yaml
-
-OUTPUT_DIR: './models/Assembly101_pi_ego/stage1/exo_rgb'
-EXO_MODALITY: ['exo_rgb']

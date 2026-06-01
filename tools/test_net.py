@@ -114,10 +114,10 @@ def perform_test(test_loader, model, test_meter, cfg, writer=None):
             # Perform the forward pass.
             preds, tokens, cls_tokens, _ = model(inputs)
 
-            if cfg.SAVE_TOKENS:
-                token_save_dir = os.path.join(cfg.OUTPUT_DIR, cfg.TOKEN_SAVE_DIR)
+            if cfg.UNIEGO.SAVE_TOKENS:
+                token_save_dir = os.path.join(cfg.OUTPUT_DIR, cfg.UNIEGO.TOKEN_SAVE_DIR)
                 os.makedirs(token_save_dir, exist_ok=True)
-                tokens_to_save = cls_tokens if cfg.GENERATION == "proxy" else tokens
+                tokens_to_save = cls_tokens if cfg.UNIEGO.GENERATION == "proxy" else tokens
                 if tokens_to_save is not None:
                     for name, token in zip(meta['filename'], tokens_to_save.detach().cpu().numpy()):
                         save_path = os.path.join(token_save_dir, f"{name}.npy")
@@ -187,7 +187,7 @@ def test(cfg):
     torch.manual_seed(cfg.RNG_SEED)
 
     # Setup logging format.
-    logging.setup_logging(cfg.OUTPUT_DIR)
+    logging.setup_logging(cfg.OUTPUT_DIR, cfg.LOG_FILE)
 
     # Print config.
     logger.info("Test with config:")

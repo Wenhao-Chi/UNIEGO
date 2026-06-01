@@ -465,6 +465,9 @@ _C.RNG_SEED = 1
 # Log period in iters.
 _C.LOG_PERIOD = 10
 
+# Log filename under OUTPUT_DIR.
+_C.LOG_FILE = "stdout.log"
+
 # If True, log the model info.
 _C.LOG_MODEL_INFO = False
 
@@ -474,44 +477,64 @@ _C.DIST_BACKEND = "nccl"
 # Global batch size
 _C.GLOBAL_BATCH_SIZE = 64
 
-# Directory to save tokens
-_C.TOKEN_SAVE_DIR = "tokens"
+# ---------------------------------------------------------------------------- #
+# UNIEGO options
+# ---------------------------------------------------------------------------- #
+_C.UNIEGO = CfgNode()
 
-# whether to save tokens
-_C.SAVE_TOKENS = False
+# Selects the UNIEGO execution path: "proxy" for stage1, "proxy_gen2" for stage2.
+_C.UNIEGO.GENERATION = "proxy"
 
-# Training mode, options include "basic" and "dist".
-_C.TRAINING_MODE = 'basic'
+# Uses normal classification loss only ("basic") or adds distillation losses ("dist").
+_C.UNIEGO.TRAINING_MODE = "basic"
 
-# Feature mode, options include "rgb" and "skl"
-_C.EXO_MODALITY = ['']
+# Stage1 teacher modality, or stage2 proxy branches such as ["feats", "logits"].
+_C.UNIEGO.EXO_MODALITY = [""]
 
-# Training scheme, for [ViT, DiT, ViT ...]
-_C.TRAINING_SCHEME = [15, 10, 5]
+# Epoch schedule for cosine_sequential learning-rate phases.
+_C.UNIEGO.TRAINING_SCHEME = [15, 10, 5]
 
-_C.LOSS_TYPE = 'cosine'
+# Number of proxy candidates selected per sample in stage2.
+_C.UNIEGO.TOP_K = 1
 
-_C.LOSS_WEIGHT = 1.0
+# If True, group candidate top-k selection by view before distillation.
+_C.UNIEGO.GROUP_TOPK_BY_VIEW = False
 
-_C.LOSS_WEIGHT_FEATS = 5.0
-_C.LOSS_WEIGHT_LOGITS = 5.0
+# Feature distillation loss type.
+_C.UNIEGO.LOSS_TYPE = "cosine"
 
-_C.DIST_THRESHOLD = 0.0
-_C.DIST_REQUIRE_TEACHER_CORRECT = True
+# Task Objective loss weight.
+_C.UNIEGO.LOSS_WEIGHT = 1.0
 
-_C.GENERATION = 'gen2'
+# Feature-token distillation loss weight.
+_C.UNIEGO.LOSS_WEIGHT_FEATS = 5.0
 
-_C.TOP_K = 1
+# Logits distillation loss weight.
+_C.UNIEGO.LOSS_WEIGHT_LOGITS = 5.0
 
-_C.MERGE_LEVEL = 'model'
+# Maximum teacher cross-entropy allowed for a candidate to supervise stage2.
+_C.UNIEGO.DIST_THRESHOLD = 4.0
 
-_C.MERGE_TOP_K = 0
+# If True, stage2 only uses teachers that predict the correct class.
+_C.UNIEGO.DIST_REQUIRE_TEACHER_CORRECT = True
 
-_C.MERGE_OUTPUT_PATH = ""
+# If True, saves intermediate tokens during inference.
+_C.UNIEGO.SAVE_TOKENS = False
 
-_C.GROUP_TOPK_BY_VIEW = False
+# Token export subdirectory under OUTPUT_DIR.
+_C.UNIEGO.TOKEN_SAVE_DIR = "tokens"
 
-_C.OPT_SPACE = 'logits'
+# Model merging granularity: model, layer, parameter, or average.
+_C.UNIEGO.MERGE_LEVEL = "model"
+
+# Number of stage1 checkpoints to merge; 0 falls back to TOP_N.
+_C.UNIEGO.MERGE_TOP_K = 0
+
+# Output checkpoint path for the merged stage1 initialization.
+_C.UNIEGO.MERGE_OUTPUT_PATH = ""
+
+# Search space used by older optimization code paths.
+_C.UNIEGO.OPT_SPACE = "logits"
 # ---------------------------------------------------------------------------- #
 # Benchmark options
 # ---------------------------------------------------------------------------- #

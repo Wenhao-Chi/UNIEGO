@@ -1,2 +1,0 @@
-# Merge stage1 proxy checkpoints into one initialization for gen2.
-_BASE_: base_stage2.yaml

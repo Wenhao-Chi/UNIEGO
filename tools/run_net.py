@@ -1,6 +1,13 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
 
 """Wrapper to train and test a video classification model."""
+import os
+import sys
+
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 from timesformer.utils.misc import launch_job
 from timesformer.utils.parser import load_config, parse_args
 
@@ -14,14 +21,14 @@ from tools.train_proxy_gen2 import train as train_proxy_gen2
 
 def get_func(cfg):
     # train_func = train
-    if cfg.GENERATION == 'proxy_gen2':
+    if cfg.UNIEGO.GENERATION == 'proxy_gen2':
         train_func = train_proxy_gen2
-    elif cfg.GENERATION == 'proxy':
+    elif cfg.UNIEGO.GENERATION == 'proxy':
         train_func = train_proxy
     else:
         raise ValueError(
             "tools/run_net.py supports GENERATION 'proxy' or 'proxy_gen2', "
-            f"but got '{cfg.GENERATION}'"
+            f"but got '{cfg.UNIEGO.GENERATION}'"
         )
     test_func = test
     return train_func, test_func

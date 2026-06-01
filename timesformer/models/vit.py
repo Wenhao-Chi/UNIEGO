@@ -505,8 +505,8 @@ class vit_base_patch16_224(nn.Module):
                                        patch_size=patch_size, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4,
                                        qkv_bias=True, norm_layer=partial(nn.LayerNorm, eps=1e-6), drop_rate=0.,
                                        attn_drop_rate=0., drop_path_rate=0.1, num_frames=cfg.DATA.NUM_FRAMES,
-                                       attention_type=cfg.TIMESFORMER.ATTENTION_TYPE, exo_modality=cfg.EXO_MODALITY,
-                                       training_mode=cfg.TRAINING_MODE, **kwargs)
+                                       attention_type=cfg.TIMESFORMER.ATTENTION_TYPE, exo_modality=cfg.UNIEGO.EXO_MODALITY,
+                                       training_mode=cfg.UNIEGO.TRAINING_MODE, **kwargs)
 
         self.attention_type = cfg.TIMESFORMER.ATTENTION_TYPE
         self.model.default_cfg = default_cfgs['vit_base_patch16_224']

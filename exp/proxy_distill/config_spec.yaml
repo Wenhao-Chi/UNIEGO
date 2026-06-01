@@ -1,0 +1,13 @@
+# Stage-specific settings live in exp/proxy_distill/<dataset>/base_*.yaml.
+# Edit this file only when the teacher loop changes.
+
+teachers:
+  - exo_rgb
+  - exo_skl
+  - exo_siglip
+  - ego_siglip
+  - exo_skego
+  - ego_depth
+  - exo_depth
+  - exo_dino
+  - ego_dino

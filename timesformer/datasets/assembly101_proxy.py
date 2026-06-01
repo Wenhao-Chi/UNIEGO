@@ -67,7 +67,7 @@ class Assembly101_proxy(torch.utils.data.Dataset):
         self.ego_dino_by_feats = cfg.DATA.EGO_DINO_BY_FEATS
         self.exo_dino_by_feats = cfg.DATA.EXO_DINO_BY_FEATS
         self.feats_dir = cfg.DATA.FEATS_DIR
-        self.distill_modalities = _resolve_distill_modalities(cfg.EXO_MODALITY)
+        self.distill_modalities = _resolve_distill_modalities(cfg.UNIEGO.EXO_MODALITY)
 
         self.modality_configs = {
             'exo_rgb': {
@@ -172,7 +172,7 @@ class Assembly101_proxy(torch.utils.data.Dataset):
 
     def _get_distill_filename(self, filename, modality_name):
         if modality_name.startswith("exo_"):
-            return filename.replace("ego_04", "exo_03")
+            return filename.replace("ego", "exo")
         return filename
 
     def _construct_loader(self):

@@ -5,6 +5,10 @@ import argparse
 from collections import OrderedDict
 import numpy as np
 
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -356,7 +360,7 @@ def train_soup_worker(cfg):
     du.init_distributed_training(cfg)
     np.random.seed(cfg.RNG_SEED)
     torch.manual_seed(cfg.RNG_SEED)
-    logging.setup_logging(cfg.OUTPUT_DIR)
+    logging.setup_logging(cfg.OUTPUT_DIR, cfg.LOG_FILE)
     logger = logging.get_logger(__name__)
 
     merge_cfg, cfg_overrides = build_merge_runtime_cfg(cfg)
@@ -534,7 +538,7 @@ def main():
     cfg = load_config(args)
 
     if CUSTOM_ARGS.merge_level is None:
-        CUSTOM_ARGS.merge_level = cfg.MERGE_LEVEL
+        CUSTOM_ARGS.merge_level = cfg.UNIEGO.MERGE_LEVEL
     try:
         CUSTOM_ARGS.merge_level = normalize_merge_level(CUSTOM_ARGS.merge_level)
     except ValueError as err:
@@ -557,13 +561,13 @@ def main():
         )
 
     if CUSTOM_ARGS.top_k is None:
-        CUSTOM_ARGS.top_k = cfg.MERGE_TOP_K if cfg.MERGE_TOP_K > 0 else cfg.TOP_K
+        CUSTOM_ARGS.top_k = cfg.UNIEGO.MERGE_TOP_K if cfg.UNIEGO.MERGE_TOP_K > 0 else cfg.UNIEGO.TOP_K
     if CUSTOM_ARGS.top_k > len(CUSTOM_ARGS.ranked_models):
         print(f"Warning: requested top_k exceeds the number of ranked models. Auto-adjusting to {len(CUSTOM_ARGS.ranked_models)}")
         CUSTOM_ARGS.top_k = len(CUSTOM_ARGS.ranked_models)
 
     if CUSTOM_ARGS.out is None:
-        CUSTOM_ARGS.out = cfg.MERGE_OUTPUT_PATH
+        CUSTOM_ARGS.out = cfg.UNIEGO.MERGE_OUTPUT_PATH
     if not CUSTOM_ARGS.out:
         out_filename = f"merged_top_{CUSTOM_ARGS.top_k}.pyth"
         if CUSTOM_ARGS.merge_level != "model":
