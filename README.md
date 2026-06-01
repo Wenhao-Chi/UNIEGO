@@ -1,7 +1,8 @@
 # UNIEGO
 
-Official implementation of UNIEGO, a hierarchical proxy-distillation framework
-for learning a unified egocentric video encoder from nine ego/exo teachers.
+Official implementation of UNIEGO: a hierarchical multi-teacher distillation 
+framework for learning a unified egocentric video encoder from teachers spanning 
+viewpoints, modalities, and foundation models.
 
 This repository supports automated experiments on:
 
