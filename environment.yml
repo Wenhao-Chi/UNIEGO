@@ -1,22 +1,18 @@
 name: uniego
 channels:
-- pytorch
 - conda-forge
-- defaults
 dependencies:
 - python=3.9
 - jupyterlab
 - pandas>=1.2
 - numpy>=1.21,<2
-- pytorch>=1.13
-- torchvision>=0.14
 - scikit-learn>=0.22
 - scipy>=1.7
 - opencv>=4.2
 - pyyaml>=5.1
 - yacs>=0.1.6
 - einops>=0.3
-- av
+- av=12.3.0
 - tensorboard
 - psutil
 - tqdm
@@ -24,5 +20,9 @@ dependencies:
 - simplejson
 - pip
 - pip:
+  # PyTorch 2.4.1 + CUDA 12.1 wheels (the +cu121 build the project was tested on).
+  - --extra-index-url https://download.pytorch.org/whl/cu121
+  - torch==2.4.1
+  - torchvision==0.19.1
   - fvcore
-  - timm
+  - timm==0.9.16

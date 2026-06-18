@@ -13,10 +13,10 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SPEC_PATH = Path(__file__).resolve().with_name("config_spec.yaml")
-PHASES = ("stage1", "gen1_infer", "merge", "stage2", "test_stage2")
+PHASES = ("stage1", "stage1_infer", "merge", "stage2", "test_stage2")
 BASE_CONFIGS = {
     "stage1": "base_stage1.yaml",
-    "gen1_infer": "base_stage1_infer.yaml",
+    "stage1_infer": "base_stage1_infer.yaml",
     "merge": "base_merge.yaml",
     "stage2": "base_stage2.yaml",
     "test_stage2": "base_stage2.yaml",
@@ -69,7 +69,7 @@ def dataset_from_configs(dataset_key):
             raise FileNotFoundError(f"Base config not found: {path}")
 
     stage1_cfg = load_yaml(cfg_paths["stage1"])
-    stage1_infer_cfg = load_yaml(cfg_paths["gen1_infer"])
+    stage1_infer_cfg = load_yaml(cfg_paths["stage1_infer"])
     merge_cfg = load_yaml(cfg_paths["merge"])
     stage2_cfg = load_yaml(cfg_paths["stage2"])
 
@@ -163,7 +163,7 @@ def stage1_overrides(spec, dataset, paths, teacher, candidates):
     ]
 
 
-def gen1_infer_overrides(spec, dataset, paths, teacher, candidates):
+def stage1_infer_overrides(spec, dataset, paths, teacher, candidates):
     output_dir = f"{paths['stage1_root']}/{teacher}"
     return [
         *candidate_overrides([teacher]),
@@ -227,7 +227,7 @@ def selected_phases(args):
         return {phase: phase in args.phase for phase in PHASES}
     return {
         "stage1": bool_env("RUN_STAGE1", True),
-        "gen1_infer": bool_env("RUN_GEN1_INFER", True),
+        "stage1_infer": bool_env("RUN_STAGE1_INFER", True),
         "merge": bool_env("RUN_MERGE", True),
         "stage2": bool_env("RUN_STAGE2", True),
         "test_stage2": bool_env("RUN_TEST_STAGE2", False),
@@ -247,7 +247,7 @@ def run_dataset(dataset_key, spec, args):
 
     print(f"\nDataset: {dataset_key}")
     print("Base configs:")
-    for phase in ("stage1", "gen1_infer", "merge", "stage2"):
+    for phase in ("stage1", "stage1_infer", "merge", "stage2"):
         print(f"  {phase}: {cfg_paths[phase].relative_to(REPO_ROOT)}")
 
     if phases["stage1"]:
@@ -267,17 +267,17 @@ def run_dataset(dataset_key, spec, args):
                 dry_run=args.dry_run,
             )
 
-    if phases["gen1_infer"]:
+    if phases["stage1_infer"]:
         print("\n[stage1 proxy inference]")
         for teacher in teachers:
             opts = remove_overridden_opts(
-                gen1_infer_overrides(spec, dataset, paths, teacher, teachers),
+                stage1_infer_overrides(spec, dataset, paths, teacher, teachers),
                 extra_opts,
             )
             run_command(
                 run_net_command(
                     args.python_bin,
-                    cfg_paths["gen1_infer"],
+                    cfg_paths["stage1_infer"],
                     opts,
                     extra_opts,
                 ),

@@ -11,8 +11,8 @@ This repository supports automated experiments on:
 - EgoExo4D
 
 The codebase builds on TimeSformer-style video transformers and adds a two-stage
-proxy workflow: gen1 proxy training, train-split proxy artifact export,
-checkpoint merging, and final gen2 proxy distillation.
+proxy workflow: stage 1 proxy training, stage 1 train-split artifact export,
+checkpoint merging, and stage 2 proxy distillation.
 
 ## Installation
 
@@ -167,19 +167,19 @@ last dimension matches the expected feature dim. Temporal features are averaged
 inside the dataloader. Missing or shape-mismatched features are replaced with
 zeros, so check feature coverage carefully before reporting final numbers.
 
-### Gen1 Proxy Artifacts
+### Stage 1 Proxy Artifacts
 
-Gen1 proxy inference exports the train-split artifacts consumed by gen2 under
+Stage 1 proxy inference exports the train-split artifacts consumed by stage 2 under
 each candidate directory:
 
 ```text
-models/<dataset>_pi_ego/stage1/<candidate>/
+models/<dataset>_uniego/stage1/<candidate>/
   tokens_training/tokens/<ego_video_key>.npy
   tokens_training/scores_pred/<ego_video_key>.npy
 ```
 
 These files keep the original ego video key, even when the candidate was trained
-from an exo teacher. If you skip gen1 training or inference, place equivalent
+from an exo teacher. If you skip stage 1 training or inference, place equivalent
 artifacts in the same candidate directories listed by
 `DATA.PROXY_CANDIDATE_ROOT` and `DATA.PROXY_CANDIDATES`.
 
@@ -195,8 +195,8 @@ bash exp/proxy_distill/assembly101/run_full_pipeline.sh
 bash exp/proxy_distill/egoexo4d/run_full_pipeline.sh
 ```
 
-Each runner executes gen1 training, gen1 train-split inference, checkpoint
-merging, and gen2 training. Add the optional test stage with:
+Each runner executes stage 1 training, stage 1 train-split inference, checkpoint
+merging, and stage 2 training. Add the optional test stage with:
 
 ```bash
 RUN_TEST_STAGE2=1 bash exp/proxy_distill/egoexo_fitness/run_full_pipeline.sh
@@ -204,18 +204,18 @@ RUN_TEST_STAGE2=1 bash exp/proxy_distill/egoexo_fitness/run_full_pipeline.sh
 
 ### Run Individual Phases
 
-The modular runner can launch one phase, and `--teacher` can limit the gen1
+The modular runner can launch one phase, and `--teacher` can limit the stage 1
 loop to a single teacher:
 
 ```bash
 python exp/proxy_distill/run_pipeline.py --dataset egoexo_fitness --phase stage1 --teacher exo_rgb
-python exp/proxy_distill/run_pipeline.py --dataset egoexo_fitness --phase gen1_infer --teacher exo_rgb
+python exp/proxy_distill/run_pipeline.py --dataset egoexo_fitness --phase stage1_infer --teacher exo_rgb
 python exp/proxy_distill/run_pipeline.py --dataset egoexo_fitness --phase merge
 python exp/proxy_distill/run_pipeline.py --dataset egoexo_fitness --phase stage2
 ```
 
 `base_stage1_infer.yaml` sets `DATA.TEST_SPLIT: train`, so the export step reads
-the original train split directly and writes the features/logits consumed by gen2.
+the original train split directly and writes the features/logits consumed by stage 2.
 
 ### Useful Runtime Controls
 
@@ -231,7 +231,7 @@ bash exp/proxy_distill/egoexo_fitness/run_full_pipeline.sh
 To skip phases:
 
 ```bash
-RUN_STAGE1=0 RUN_GEN1_INFER=0 bash exp/proxy_distill/egoexo_fitness/run_full_pipeline.sh
+RUN_STAGE1=0 RUN_STAGE1_INFER=0 bash exp/proxy_distill/egoexo_fitness/run_full_pipeline.sh
 ```
 
 Additional `KEY VALUE` config overrides can be appended after the runner
@@ -256,10 +256,10 @@ UNIEGO keeps the automated pipeline compact:
 - `<dataset>/base_stage1.yaml`: Stage 1 single-teacher proxy training.
 - `<dataset>/base_stage1_infer.yaml`: Stage 1 train-split artifact export.
 - `<dataset>/base_merge.yaml`: Stage 1 checkpoint merging.
-- `<dataset>/base_stage2.yaml`: Stage 2 proxy-gen2 training and testing.
+- `<dataset>/base_stage2.yaml`: Stage 2 proxy training and testing.
 - `UNIEGO` config blocks: distillation mode, teacher modalities, loss weights,
   top-k selection, merge output, and token export settings.
-- `run_pipeline.py`: expands teacher loops and gen1 inference exports.
+- `run_pipeline.py`: expands teacher loops and stage 1 inference exports.
 
 The stage configs can also be called directly. Stage 1 train/infer configs
 default to `exo_rgb`; use `run_pipeline.py` to loop over all teachers.
@@ -275,13 +275,13 @@ python tools/run_net.py --cfg exp/proxy_distill/egoexo_fitness/base_stage2.yaml
 
 ```text
 exp/proxy_distill/        Automated pipeline spec, base configs, and runners
-timesformer/datasets/     Dataset loaders for proxy and proxy-gen2 training
-timesformer/models/       Backbone and proxy ViT models
+timesformer/datasets/     Dataset loaders for stage 1 and stage 2 training
+timesformer/models/       Backbone and UNIEGO proxy ViT models
 timesformer/utils/        Config parsing, checkpointing, distributed utilities
 tools/run_net.py          Main train/test entry point
-tools/merging_models.py   Gen1 checkpoint merging
-tools/train_proxy.py      Gen1 proxy training
-tools/train_proxy_gen2.py Gen2 proxy training
+tools/merging_models.py   Stage 1 checkpoint merging
+tools/train_proxy.py      Stage 1 proxy training
+tools/train_proxy_gen2.py Stage 2 proxy training
 tools/test_net.py         Evaluation and artifact export
 ```
 
@@ -290,18 +290,18 @@ files are intentionally ignored by Git through `.gitignore`.
 
 ## Checkpoints and Results
 
-Final gen2 checkpoints for reproducing the paper results should be downloaded
-from the links below and placed under each dataset's gen2 output directory.
+Final stage 2 checkpoints for reproducing the paper results should be downloaded
+from the links below and placed under each dataset's stage 2 output directory.
 
-| Dataset | Paper top-1 | Final gen2 checkpoint                                                                        | Expected local path |
+| Dataset | Paper top-1 | Final stage 2 checkpoint                                                                        | Expected local path |
 | --- | --- |----------------------------------------------------------------------------------------------| --- |
-| EgoExo-Fitness | 84.7 | [Checkpoint](https://huggingface.co/ColinChi/UNIEGO/blob/main/EgoExo_Fitness_UNIEGO_gen2.pyth) | `models/EgoExo_Fitness_pi_ego_gen2/dist_top1_from_merged/checkpoints/checkpoint_epoch_00015.pyth` |
-| Assembly101 | 50.7 | [Checkpoint](https://huggingface.co/ColinChi/UNIEGO/blob/main/Assembly_101_UNIEGO_gen2.pyth) | `models/Assembly101_pi_ego_gen2/dist_top1_from_merged/checkpoints/checkpoint_epoch_00015.pyth` |
-| EgoExo4D | 41.1 | [Checkpoint](https://huggingface.co/ColinChi/UNIEGO/resolve/main/EgoExo_4D_UNIEGO_gen2.pyth) | `models/EgoExo_4D_pi_ego_gen2/dist_top2_from_merged/checkpoints/checkpoint_epoch_00015.pyth` |
+| EgoExo-Fitness | 84.7 | [Checkpoint](https://huggingface.co/ColinChi/UNIEGO/blob/main/EgoExo_Fitness_UNIEGO_gen2.pyth) | `models/EgoExo_Fitness_uniego_gen2/dist_top1_from_merged/checkpoints/checkpoint_epoch_00015.pyth` |
+| Assembly101 | 50.7 | [Checkpoint](https://huggingface.co/ColinChi/UNIEGO/blob/main/Assembly_101_UNIEGO_gen2.pyth) | `models/Assembly101_uniego_gen2/dist_top1_from_merged/checkpoints/checkpoint_epoch_00015.pyth` |
+| EgoExo4D | 41.1 | [Checkpoint](https://huggingface.co/ColinChi/UNIEGO/blob/main/EgoExo_4D_UNIEGO_gen2.pyth) | `models/EgoExo_4D_uniego_gen2/dist_top2_from_merged/checkpoints/checkpoint_epoch_00015.pyth` |
 
-### Direct Inference with a Gen2 Checkpoint
+### Direct Inference with a Stage 2 Checkpoint
 
-After placing a checkpoint at the expected gen2 path, run the dataset's test
+After placing a checkpoint at the expected stage 2 path, run the dataset's test
 phase:
 
 ```bash

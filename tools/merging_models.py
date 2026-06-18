@@ -25,7 +25,7 @@ import timesformer.utils.logging as logging
 
 
 PROXY_MODEL_FALLBACKS = {
-    "pi_proxy_vit": "vit_base_patch16_224",
+    "uniego_vit": "vit_base_patch16_224",
 }
 
 PROXY_DATASET_FALLBACKS = {

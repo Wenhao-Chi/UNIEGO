@@ -7,7 +7,7 @@ TRAIN:
   EVAL_PERIOD: 5
   CHECKPOINT_PERIOD: 5
   AUTO_RESUME: False
-  CHECKPOINT_FILE_PATH: './models/Assembly101_pi_ego/merged_checkpoints/merged_top_9_model.pyth'
+  CHECKPOINT_FILE_PATH: './models/Assembly101_uniego/merged_checkpoints/merged_top_9_model.pyth'
   CHECKPOINT_EPOCH_RESET: True
 TEST:
   ENABLE: True
@@ -30,7 +30,7 @@ DATA:
   EGO_DINO_BY_FEATS: './data/Assembly101/distillation/ego_dino'
   EXO_DINO_BY_FEATS: './data/Assembly101/distillation/exo_dino'
   FEATS_DIR: 'features'
-  PROXY_CANDIDATE_ROOT: './models/Assembly101_pi_ego/stage1'
+  PROXY_CANDIDATE_ROOT: './models/Assembly101_uniego/stage1'
   PROXY_CANDIDATES: ['exo_rgb', 'exo_skl', 'exo_siglip', 'ego_siglip', 'exo_skego', 'ego_depth', 'exo_depth', 'exo_dino', 'ego_dino']
   PROXY_LOGITS_DIR: 'tokens_training/scores_pred'
   PROXY_FEATS_DIR: 'tokens_training/tokens'
@@ -45,7 +45,7 @@ DATA:
 TIMESFORMER:
   ATTENTION_TYPE: 'divided_space_time'
 MODEL:
-  MODEL_NAME: pi_proxy_vit
+  MODEL_NAME: uniego_vit
   NUM_CLASSES: 24
   ARCH: vit
   LOSS_FUNC: cross_entropy
@@ -69,7 +69,7 @@ NUM_GPUS: 4
 NUM_SHARDS: 1
 RNG_SEED: 0
 
-OUTPUT_DIR: './models/Assembly101_pi_ego_gen2/dist_top1_from_merged'
+OUTPUT_DIR: './models/Assembly101_uniego_gen2/dist_top1_from_merged'
 UNIEGO:
   GENERATION: 'proxy_gen2'
   TRAINING_MODE: 'dist'
@@ -86,4 +86,4 @@ UNIEGO:
   TOKEN_SAVE_DIR: 'tokens_training/tokens'
   MERGE_LEVEL: 'model'
   MERGE_TOP_K: 9
-  MERGE_OUTPUT_PATH: './models/Assembly101_pi_ego/merged_checkpoints/merged_top_9_model.pyth'
+  MERGE_OUTPUT_PATH: './models/Assembly101_uniego/merged_checkpoints/merged_top_9_model.pyth'

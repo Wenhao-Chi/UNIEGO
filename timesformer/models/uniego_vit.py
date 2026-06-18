@@ -32,7 +32,7 @@ def _normalize_exo_modalities(exo_modality):
 def _resolve_proxy_modalities(exo_modality):
     modalities = _normalize_exo_modalities(exo_modality)
     if not modalities:
-        raise ValueError("pi_proxy_vit requires at least one exo modality.")
+        raise ValueError("uniego_vit requires at least one exo modality.")
 
     for modality in modalities:
         if modality not in PROXY_DISTILL_DIM_MAP:
@@ -163,9 +163,9 @@ class VisionTransformerProxy(VisionTransformer):
 
 
 @MODEL_REGISTRY.register()
-class pi_proxy_vit(nn.Module):
+class uniego_vit(nn.Module):
     def __init__(self, cfg, **kwargs):
-        super(pi_proxy_vit, self).__init__()
+        super(uniego_vit, self).__init__()
         self.pretrained = True
         patch_size = 16
         self.model = VisionTransformerProxy(

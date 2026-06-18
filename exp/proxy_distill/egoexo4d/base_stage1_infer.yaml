@@ -15,7 +15,7 @@ TEST:
   BATCH_SIZE: 8
   NUM_ENSEMBLE_VIEWS: 1
   NUM_SPATIAL_CROPS: 1
-  CHECKPOINT_FILE_PATH: './models/EgoExo_4D_pi_ego/stage1/exo_rgb/checkpoints/checkpoint_epoch_00015.pyth'
+  CHECKPOINT_FILE_PATH: './models/EgoExo_4D_uniego/stage1/exo_rgb/checkpoints/checkpoint_epoch_00015.pyth'
   SAVE_RESULTS_PATH: 'tokens_training/scores_pred'
 DATA:
   PATH_TO_DATA_DIR: './data/EgoExo4D/annotations/csvs/keystep_segments/ego'
@@ -30,7 +30,7 @@ DATA:
   EGO_DINO_BY_FEATS: './data/EgoExo4D/distillation/ego_dino'
   EXO_DINO_BY_FEATS: './data/EgoExo4D/distillation/exo_dino'
   FEATS_DIR: 'features'
-  PROXY_CANDIDATE_ROOT: './models/EgoExo_4D_pi_ego/stage1'
+  PROXY_CANDIDATE_ROOT: './models/EgoExo_4D_uniego/stage1'
   PROXY_CANDIDATES: ['exo_rgb', 'exo_skl', 'exo_siglip', 'ego_siglip', 'exo_skego', 'ego_depth', 'exo_depth', 'exo_dino', 'ego_dino']
   PROXY_LOGITS_DIR: 'tokens_training/scores_pred'
   PROXY_FEATS_DIR: 'tokens_training/tokens'
@@ -45,7 +45,7 @@ DATA:
 TIMESFORMER:
   ATTENTION_TYPE: 'divided_space_time'
 MODEL:
-  MODEL_NAME: pi_proxy_vit
+  MODEL_NAME: uniego_vit
   NUM_CLASSES: 665
   ARCH: vit
   LOSS_FUNC: cross_entropy
@@ -69,7 +69,7 @@ NUM_GPUS: 4
 NUM_SHARDS: 1
 RNG_SEED: 0
 
-OUTPUT_DIR: './models/EgoExo_4D_pi_ego/stage1/exo_rgb'
+OUTPUT_DIR: './models/EgoExo_4D_uniego/stage1/exo_rgb'
 LOG_FILE: 'stdout_infer.log'
 UNIEGO:
   GENERATION: 'proxy'
