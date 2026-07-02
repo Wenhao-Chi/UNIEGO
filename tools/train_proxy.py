@@ -17,6 +17,7 @@ import timesformer.utils.metrics as metrics
 import timesformer.utils.misc as misc
 import timesformer.visualization.tensorboard_vis as tb
 from timesformer.datasets import loader
+from timesformer.datasets import utils as data_utils
 from timesformer.models import build_model
 from timesformer.utils.meters import TrainMeter, ValMeter
 from timesformer.utils.multigrid import MultigridSchedule
@@ -613,3 +614,8 @@ def train(cfg):
 
     if writer is not None:
         writer.close()
+
+    if cfg.DATA.REPORT_DISTILL_COVERAGE and du.is_master_proc(
+        cfg.NUM_GPUS * cfg.NUM_SHARDS
+    ):
+        data_utils.log_distill_coverage(train_loader.dataset)

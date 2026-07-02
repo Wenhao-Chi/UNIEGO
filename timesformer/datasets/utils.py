@@ -22,6 +22,32 @@ def get_split_name(cfg, mode):
     return mode
 
 
+def log_distill_coverage(dataset):
+    """Log a per-modality teacher-feature coverage report for a stage 1 proxy
+    dataset. Reuses the dataset's own path derivation (``modality_configs`` and
+    ``_get_distill_filename``) so it cannot drift from the loader. Call once from
+    the main process, e.g. at the end of training."""
+    for modality in dataset.distill_modalities:
+        feat_dir = dataset.modality_configs[modality]["feat_dir"]
+        present = 0
+        missing = 0
+        for video_path in dataset._path_to_videos:
+            key = os.path.basename(video_path).split(".")[0]
+            fname = dataset._get_distill_filename(key, modality) + ".npy"
+            if os.path.exists(os.path.join(feat_dir, fname)):
+                present += 1
+            else:
+                missing += 1
+        total = present + missing
+        logger.info(
+            "[distill coverage] %s: %d/%d present, %d missing -> zero-filled",
+            modality,
+            present,
+            total,
+            missing,
+        )
+
+
 def retry_load_images(image_paths, retry=10, backend="pytorch"):
     """
     This function is to load images with support of retrying for failed load.

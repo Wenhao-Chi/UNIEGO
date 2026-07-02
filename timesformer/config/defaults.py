@@ -316,11 +316,15 @@ _C.DATA.EXO_DINO_BY_FEATS = ""
 _C.DATA.RGB_MODEL_BY_FEATS_AND_LOGITS = ""
 _C.DATA.MERGED_MODEL = ""
 _C.DATA.LOGITS_DIR = ""
-_C.DATA.FEATS_DIR = ""
 _C.DATA.PROXY_CANDIDATE_ROOT = ""
 _C.DATA.PROXY_CANDIDATES = []
 _C.DATA.PROXY_LOGITS_DIR = ""
 _C.DATA.PROXY_FEATS_DIR = ""
+
+# If True, log a per-modality teacher-feature coverage report at the end of
+# stage 1 training (how many keys were present vs. missing -> zero-filled).
+# Does not raise; default behavior is unchanged.
+_C.DATA.REPORT_DISTILL_COVERAGE = False
 
 # Video path prefix if any.
 _C.DATA.PATH_PREFIX = ""

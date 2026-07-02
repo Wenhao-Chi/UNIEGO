@@ -28,7 +28,6 @@ DATA:
   EXO_DEPTH_BY_FEATS: './data/EgoExo4D/distillation/exo_depth'
   EGO_DINO_BY_FEATS: './data/EgoExo4D/distillation/ego_dino'
   EXO_DINO_BY_FEATS: './data/EgoExo4D/distillation/exo_dino'
-  FEATS_DIR: 'features'
   PROXY_CANDIDATE_ROOT: './models/EgoExo_4D_uniego/stage1'
   PROXY_CANDIDATES: ['exo_rgb', 'exo_skl', 'exo_siglip', 'ego_siglip', 'exo_skego', 'ego_depth', 'exo_depth', 'exo_dino', 'ego_dino']
   PROXY_LOGITS_DIR: 'tokens_training/scores_pred'

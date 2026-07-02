@@ -91,17 +91,16 @@ class Egoexo_fitness_proxy(torch.utils.data.Dataset):
         self.exo_depth_by_feats = cfg.DATA.EXO_DEPTH_BY_FEATS
         self.ego_dino_by_feats = cfg.DATA.EGO_DINO_BY_FEATS
         self.exo_dino_by_feats = cfg.DATA.EXO_DINO_BY_FEATS
-        self.feats_dir = cfg.DATA.FEATS_DIR
         self.distill_modalities = _resolve_distill_modalities(cfg.UNIEGO.EXO_MODALITY)
 
         self.modality_configs = {
             'exo_rgb': {
-                'feat_dir': os.path.join(self.rgb_model_by_feats, self.feats_dir),
+                'feat_dir': os.path.join(self.rgb_model_by_feats),
                 'feat_dim': 768,
                 'meta_key': 'exo_rgb',
             },
             'exo_skl': {
-                'feat_dir': os.path.join(self.skl_model_by_feats, self.feats_dir),
+                'feat_dir': os.path.join(self.skl_model_by_feats),
                 'feat_dim': 256,
                 'meta_key': 'exo_skl',
             },

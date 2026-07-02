@@ -1,7 +1,25 @@
-# UNIEGO
+<div align="center">
 
-Official implementation of UNIEGO: a hierarchical multi-teacher distillation 
-framework for learning a unified egocentric video encoder from teachers spanning 
+<h1>UNIEGO</h1>
+
+<h3>Proxies as Mediators for Unified Egocentric Video Representation Learning</h3>
+
+<p>
+  <a href="https://arxiv.org/abs/2606.20559">
+    <img src="https://img.shields.io/badge/arXiv-2606.20559-b31b1b.svg" alt="arXiv">
+  </a>
+  <a href="https://huggingface.co/ColinChi/UNIEGO/tree/main">
+    <img src="https://img.shields.io/badge/Hugging%20Face-Model%20Weights-ffcc4d.svg" alt="Hugging Face">
+  </a>
+</p>
+
+<img src="assets/teaser.png" alt="UNIEGO teaser" width="92%">
+<img src="assets/diagram.png" alt="UNIEGO diagram" width="92%">
+
+</div>
+
+Official implementation of UNIEGO: a hierarchical multi-teacher distillation
+framework for learning a unified egocentric video encoder from teachers spanning
 viewpoints, modalities, and foundation models.
 
 This repository supports automated experiments on:
@@ -79,8 +97,8 @@ relative_video_path,label
 Example:
 
 ```text
-clips/ego_04_take_0001.mp4,7
-clips/ego_04_take_0002.mp4,11
+clips/take_0001_ego.mp4,7
+clips/take_0002_ego.mp4,11
 ```
 
 ### Teacher Features
@@ -89,16 +107,24 @@ Stage 1 reads one `.npy` teacher feature per video and modality. By default,
 the expected directory layout is:
 
 ```text
-data/<dataset>/distillation/
-  exo_rgb/
-  exo_skl/
-  exo_siglip/
-  ego_siglip/
-  exo_skego/
-  ego_depth/
-  exo_depth/
-  exo_dino/
-  ego_dino/
+data/<dataset>/
+├── vclip/                        # DATA.PATH_TO_DATA_DIR — split CSV files
+│   ├── train.csv
+│   ├── val.csv
+│   └── test.csv
+├── videos_subaction/             # DATA.PATH_PREFIX - CSV paths are resolved relative to this dir
+│   ├── <name>_ego.mp4
+│   └── <name>_exo.mp4
+└── distillation/                 # teacher features
+    ├── exo_rgb/<name>_exo.npy     # 768-d
+    ├── exo_skl/<name>_exo.npy     # 256-d
+    ├── exo_siglip/<name>_exo.npy  # 1152-d
+    ├── ego_siglip/<name>_ego.npy  # 1152-d
+    ├── exo_skego/<name>_exo.npy   # 512-d
+    ├── ego_depth/<name>_ego.npy   # 1024-d
+    ├── exo_depth/<name>_exo.npy   # 1024-d
+    ├── exo_dino/<name>_exo.npy    # 1024-d
+    └── ego_dino/<name>_ego.npy    # 1024-d
 ```
 
 The base configs and pipeline runner map those directories to the teacher pool
@@ -116,14 +142,13 @@ used in the paper:
 | `exo_dino` | [DINOv2](https://github.com/facebookresearch/dinov2) | `DATA.EXO_DINO_BY_FEATS` | 1024 |
 | `ego_dino` | [DINOv2](https://github.com/facebookresearch/dinov2) | `DATA.EGO_DINO_BY_FEATS` | 1024 |
 
-Feature filenames are shared across Assembly101, EgoExo-Fitness, and EgoExo4D.
-For a CSV row, use the video basename without extension as the key. The filename
-only encodes the view:
+Each teacher feature is one `.npy` named after the **source clip it was extracted from**
+(basename without extension); the modality/model name is the directory:
 
-- Ego teacher features use the original video key.
-- Exo teacher features replace `ego` with `exo` in the video key.
-- The teacher modality or model name belongs to the directory path, not the
-  filename.
+- `ego_*` modalities are extracted from the **ego** clip → key is the ego clip name
+  (e.g. `take_0001_ego`).
+- `exo_*` modalities are extracted from the **exo** clip → key is the exo clip name
+  (e.g. `take_0001_exo`).
 
 ```python
 from pathlib import Path
@@ -143,9 +168,8 @@ FEATURE_DIMS = {
     "ego_dino": 1024,
 }
 
-video_path = "clips/ego_04_take_0001.mp4"
 modality = "exo_dino"
-view = "exo"
+video_path = "clips/take_0001_exo.mp4"    # exocentric clip for an exo_* modality
 
 with torch.no_grad():
     pred, feature = teacher_model(x)  # feature shape: [D] or [T, D]
@@ -153,19 +177,17 @@ with torch.no_grad():
 feature = feature.detach().cpu().numpy().astype("float32")
 assert feature.shape[-1] == FEATURE_DIMS[modality]
 
-video_key = Path(video_path).stem
-if view == "exo":
-    video_key = video_key.replace("ego", "exo")
+video_key = Path(video_path).stem  # "take_0001_exo" — just the source clip name
 
 save_dir = Path("data/<DATASET>/distillation") / modality
 save_dir.mkdir(parents=True, exist_ok=True)
-np.save(save_dir / f"{video_key}.npy", feature)
+np.save(save_dir / f"{video_key}.npy", feature)  # -> .../exo_dino/take_0001_exo.npy
 ```
 
-Teacher features may be saved as a single vector or as temporal features whose
-last dimension matches the expected feature dim. Temporal features are averaged
-inside the dataloader. Missing or shape-mismatched features are replaced with
-zeros, so check feature coverage carefully before reporting final numbers.
+Missing or shape-mismatched features are replaced with
+zeros, so check feature coverage carefully before reporting final numbers. Set
+`DATA.REPORT_DISTILL_COVERAGE True` to log a per-modality coverage report (how
+many keys were present vs. missing and zero-filled) at the end of stage 1 training.
 
 ### Stage 1 Proxy Artifacts
 
@@ -326,8 +348,19 @@ format. Per-video logits are saved to:
 
 ## Citation
 
-If this project is helpful for your research, please cite the paper once it is
-available. The BibTeX entry will be added upon release.
+If this project is helpful for your research, please consider citing UNIEGO:
+
+```text
+@misc{chi2026uniego,
+      title={UNIEGO: Proxies as Mediators for Unified Egocentric Video Representation Learning},
+      author={Wenhao Chi and Arkaprava Sinha and Dominick Reilly and Hieu Le and Srijan Das},
+      year={2026},
+      eprint={2606.20559},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2606.20559},
+}
+```
 
 ## Acknowledgements
 
